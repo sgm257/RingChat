@@ -103,7 +103,7 @@ public class ChatNode implements Runnable
         }
         catch(Exception e)
         {
-            propertiesFile = "config/ChatNodeDefaults.properties";
+            propertiesFile = "config/base.properties";
         }
 
         // start ChatNode
