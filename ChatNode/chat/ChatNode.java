@@ -35,8 +35,16 @@ public class ChatNode implements Runnable
         int myPort = 0;
         String myName;
 
-        // parse properties file
-        properties = new PropertyHandler(propertiesFile);
+        try
+        {
+            // parse properties file
+            properties = new PropertyHandler(propertiesFile);
+        }
+        catch(Exception e)
+        {
+            System.err.println("Error getting info from properties file");
+            System.exit(1);
+        }
 
         // get my IP
         myIP = properties.getProperty("MY_IP");
@@ -57,7 +65,7 @@ public class ChatNode implements Runnable
         return myNodeInfo;
     }
 
-    NodeInfo getNextNodeInfo()
+    NodeInfo getNextNode()
     {
         return nextNode;
     }
@@ -78,10 +86,10 @@ public class ChatNode implements Runnable
     public void run()
     {
         // start receiver
-        (receiver = new Receiver()).start();
+        (receiver = new Receiver(this)).start();
 
         // new start the sender
-        (sender = new Sender()).start();
+        (sender = new Sender(this)).start();
     }
 
     // main()

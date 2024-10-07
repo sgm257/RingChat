@@ -82,10 +82,10 @@ public class Sender extends Thread implements MessageTypes
 
                 // if there is information that may override the connectivity information
                 // that was provided through the parameters
-                chatNode.nextnode = new NodeInfo(connectivityInfo[1], Integer.parseInt(connectivityInfo[2]));
+                chatNode.setNextNodeInfo(new NodeInfo(connectivityInfo[1], Integer.parseInt(connectivityInfo[2])));
 
                 // check if we have valid server connectivity information
-                if(chatNode.nextNode == null)
+                if(chatNode.getNextNode() == null)
                 {
                     System.err.println("[Sender].run No server connectivity informtion provided!");
                     continue;
@@ -94,7 +94,7 @@ public class Sender extends Thread implements MessageTypes
                 // server information was provided, so send join request
                 try
                 {
-                    message = new Message(JOIN, chatNode.myNodeInfo, chatNode.nextNode);
+                    message = new Message(JOIN, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     send_message(message);
                 }
@@ -120,7 +120,7 @@ public class Sender extends Thread implements MessageTypes
                 // send leave request
                 try
                 {
-                    message = new Message(LEAVE, chatNode.myNodeInfo, chatNode.nextNode);
+                    message = new Message(LEAVE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     send_message(message);
                 }
@@ -140,7 +140,7 @@ public class Sender extends Thread implements MessageTypes
                 // we are a participant, send out a SHUTDOWN_ALL message
                 try
                 {
-                    message = new Message(LEAVE, chatNode.myNodeInfo, chatNode.nextNode);
+                    message = new Message(LEAVE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     send_message(message);                    
                 }
@@ -166,7 +166,7 @@ public class Sender extends Thread implements MessageTypes
                 // we are a participant, send out a SHUTDOWN_ALL message
                 try
                 {
-                    message = new Message(SHUTDOWN_ALL, chatNode.myNodeInfo, chatNode.nextNode);
+                    message = new Message(SHUTDOWN_ALL, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     send_message(message);
                 }
@@ -188,7 +188,7 @@ public class Sender extends Thread implements MessageTypes
                 // send note
                 try
                 {
-                    message = new Message(NOTE, chatNode.myNodeInfo, chatNode.nextNode);
+                    message = new Message(NOTE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     send_message(message);
 
@@ -208,20 +208,27 @@ public class Sender extends Thread implements MessageTypes
     void send_message(Message message)
     {
         // variables
-        Socket connection;
+        Socket connection;        
 
-        // open connection to server
-        connection = new Socket(message.getNextNode().getAddress(), message.getNextNode().getPort());
+        try
+        {
+            // open connection to server
+            connection = new Socket(message.getNextNode().getAddress(), message.getNextNode().getPort());
 
-        // open object streams
-        //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-        writeToNet = new ObjectOutputStream(connection.getOutputStream());
+            // open object streams
+            //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
+            writeToNet = new ObjectOutputStream(connection.getOutputStream());
 
-        // send note
-        writeToNet.writeObject(message);
+            // send note
+            writeToNet.writeObject(message);
 
-        // close connection
-        connection.close();
+            // close connection
+            connection.close();
+        }
+        catch(Exception e)
+        {
+            System.err.println("Error connecting to server, opening streams, or closing connection");
+        }
 
         System.out.println("Message sent...");
 

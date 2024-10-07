@@ -13,7 +13,7 @@ import chat.NodeInfo;
 public class Message implements MessageTypes, Serializable {
     
     // type of message, types are defined in interface MessageTypes
-    int type = null;
+    int type = -1;
 
     // content of a note
     String content = "";

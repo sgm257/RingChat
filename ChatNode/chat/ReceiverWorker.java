@@ -8,7 +8,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import message.Message;
 import static message.MessageTypes.NOTE;
+import static message.MessageTypes.LEAVE;
+import static message.MessageTypes.JOIN;
 import static message.MessageTypes.SHUTDOWN;
+import static message.MessageTypes.SHUTDOWN_ALL;
+
 
 /**
  * A thread processing a connection with the chat server
@@ -66,7 +70,7 @@ public class ReceiverWorker extends Thread
         switch(message.getType())
         {
             case JOIN:
-                System.out.println("Received join message from %s, processing", message.getSender().getName());
+                System.out.println("Received join message from " + message.getSender().getName() + ", processing");
 
                 String test = new String("approved");
 
@@ -77,9 +81,9 @@ public class ReceiverWorker extends Thread
                     // set next node to sender, closing the ring
                     chatNode.setNextNodeInfo(message.getSender());
                 }
-                else if(!chatNode.nextNode.equals(message.getSender()))
+                else if(!chatNode.getNextNode().equals(message.getSender()))
                 {
-                    Message message = new Message(JOIN_APPROVED, myNodeInfo, chatNode.nextNode);
+                    Message message = new Message(JOIN, chatNode.getMyNodeInfo(), chatNode.getNextNode());
 
                     chatNode.setNextNodeInfo(message.getSender());
 
@@ -91,11 +95,11 @@ public class ReceiverWorker extends Thread
                 break;
 
             case NOTE:
-                System.out.println("Received note message from %s, processing", message.getSender().getName());
+                System.out.println("Received note message from " + message.getSender().getName() + ", processing");
 
                 System.out.println((String) message.getContent());
                 
-                if(!chatNode.nextNode.equals(message.getSender()))
+                if(!chatNode.getNextNode().equals(message.getSender()))
                 {
                     sender.send_message(message);
                 }
@@ -103,9 +107,9 @@ public class ReceiverWorker extends Thread
                 break;
 
             case LEAVE:
-                System.out.println("Received leave message from %s, processing", message.getSender().getName());
+                System.out.println("Received leave message from " + message.getSender().getName() + ", processing");
 
-                if(!chatNode.nextNode.equals(message.getSender()))
+                if(!chatNode.getNextNode().equals(message.getSender()))
                 {
                     sender.send_message(message);
                 }
@@ -117,7 +121,7 @@ public class ReceiverWorker extends Thread
                 break;
 
             case SHUTDOWN_ALL:
-                if(!chatNode.nextNode.equals(message.getSender()))
+                if(!chatNode.getNextNode().equals(message.getSender()))
                 {
                     sender.send_message(message);
                 }
