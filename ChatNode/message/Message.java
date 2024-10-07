@@ -13,22 +13,27 @@ import chat.NodeInfo;
 public class Message implements MessageTypes, Serializable {
     
     // type of message, types are defined in interface MessageTypes
-    int type;
+    int type = null;
 
     // content of a note
-    String content;
+    String content = "";
 
     // sending ip info
-    NodeInfo sender;
+    NodeInfo sender = null;
 
     // next node ip info
-    NodeInfo nextNode;
+    NodeInfo nextNode = null;
 
-    
-    // constructor
+    // constructor (s)
     public Message(int type, String content, NodeInfo sender, NodeInfo nextNode) {
         this.type = type;
         this.content = content;
+        this.sender = sender;
+        this.nextNode = nextNode;
+    }
+
+    public Message(int type, NodeInfo sender, NodeInfo nextNode) {
+        this.type = type;
         this.sender = sender;
         this.nextNode = nextNode;
     }

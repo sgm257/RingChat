@@ -21,25 +21,47 @@ import message.MessageTypes;
  */
 public class Sender extends Thread implements MessageTypes
 {
-    Socket serverConnection = null;
+    Socket connection = null;
+    ObjectOutputStream writeToNet;
     Scanner userInput = new Scanner(System.in);
     String inputLine = null;
+    ChatNode chatNode = null;
     boolean hasJoined;  // flag indicating if we have joined chat
 
     // Constructor
-    public Sender()
+    public Sender(ChatNode chatNode)
     {
+        this.chatNode = chatNode;
         userInput = new Scanner(System.in);
         hasJoined = false;
     }
+
+
+    // make a sender function that can take input from either the command line
+    // or the reciever worker as a parameter
+
+    /*
+    Name: run
+    Process: monitors the command line input and takes appropriate action based on the requested command
+             JOIN: 
+             LEAVE: 
+             SHUTDOWN:
+             SHUTDOWN_ALL:
+             NOTE:
+    Function Input/Parameters: 
+    Function Output/Parameters: 
+    Function Output/Returned: 
+    Device Input/device: 
+    Device Output/device: 
+    Dependencies: 
+    */
 
     // implementation interface runnable not needed for threading
     @Override
     public void run()
     {
-        ObjectOutputStream writeToNet;
-        ObjectInputStream readFromNet;
-
+        Message message;
+        
         // until forever, unless the user enters SHUTDOWN or SHUTDOWN_ALL
         while(true)
         {
@@ -60,10 +82,10 @@ public class Sender extends Thread implements MessageTypes
 
                 // if there is information that may override the connectivity information
                 // that was provided through the parameters
-                ChatClient.serverNodeInfo = new NodeInfo(connectivityInfo[1], Integer.parseInt(connectivityInfo[2]));
+                chatNode.nextnode = new NodeInfo(connectivityInfo[1], Integer.parseInt(connectivityInfo[2]));
 
                 // check if we have valid server connectivity information
-                if(ChatClient.serverNodeInfo == null)
+                if(chatNode.nextNode == null)
                 {
                     System.err.println("[Sender].run No server connectivity informtion provided!");
                     continue;
@@ -72,18 +94,9 @@ public class Sender extends Thread implements MessageTypes
                 // server information was provided, so send join request
                 try
                 {
-                    // open connection to server
-                    serverConnection = new Socket(ChatClient.serverNodeInfo.getAddress(), ChatClient.serverNodeInfo.getPort());
-
-                    // open object streams
-                    readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-                    writeToNet = new ObjectOutputStream(serverConnection.getOutputStream());
-
-                    // send join request
-                    writeToNet.writeObject(new Message(JOIN, ChatClient.myNodeInfo));
-
-                    // close connection
-                    serverConnection.close();
+                    message = new Message(JOIN, chatNode.myNodeInfo, chatNode.nextNode);
+                    
+                    send_message(message);
                 }
                 catch(Exception e)
                 {
@@ -107,18 +120,9 @@ public class Sender extends Thread implements MessageTypes
                 // send leave request
                 try
                 {
-                    // open connection to server
-                    serverConnection = new Socket(ChatClient.serverNodeInfo.getAddress(), ChatClient.serverNodeInfo.getPort());
-
-                    // open object streams
-                    readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-                    writeToNet = new ObjectOutputStream(serverConnection.getOutputStream());
-
-                    // send join request                    
-                    writeToNet.writeObject(new Message(LEAVE, ChatClient.myNodeInfo));
-
-                    // close connection
-                    serverConnection.close();
+                    message = new Message(LEAVE, chatNode.myNodeInfo, chatNode.nextNode);
+                    
+                    send_message(message);
                 }
                 catch(Exception e)
                 {
@@ -130,6 +134,25 @@ public class Sender extends Thread implements MessageTypes
                 hasJoined = false;
 
                 System.out.println("Left chat...");
+            }
+            else if(inputLine.startsWith("SHUTDOWN"))
+            {
+                // we are a participant, send out a SHUTDOWN_ALL message
+                try
+                {
+                    message = new Message(LEAVE, chatNode.myNodeInfo, chatNode.nextNode);
+                    
+                    send_message(message);                    
+                }
+                catch(Exception e)
+                {
+                    System.err.println("Error opening or writing to object streams, or closing connection");
+                }
+
+                System.out.println("Sent shutdown notice...\n");
+
+                System.out.println("Exiting...\n");
+                System.exit(1);
             }
             else if(inputLine.startsWith("SHUTDOWN_ALL"))
             {
@@ -143,57 +166,16 @@ public class Sender extends Thread implements MessageTypes
                 // we are a participant, send out a SHUTDOWN_ALL message
                 try
                 {
-                    // open connection to server
-                    serverConnection = new Socket(ChatClient.serverNodeInfo.getAddress(), ChatClient.serverNodeInfo.getPort());
-
-                    // open object streams
-                    readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-                    writeToNet = new ObjectOutputStream(serverConnection.getOutputStream());
-
-                    // send shutdown all request
-                    writeToNet.writeObject(new Message(SHUTDOWN_ALL, ChatClient.myNodeInfo));
-
-                    // close connection
-                    serverConnection.close();
+                    message = new Message(SHUTDOWN_ALL, chatNode.myNodeInfo, chatNode.nextNode);
+                    
+                    send_message(message);
                 }
                 catch(Exception e)
                 {
                     System.err.println("Error opening or writing to object streams, or closing connection");
                 }
 
-                System.out.println("Sent shutdown all request...\n");
-            }
-            else if(inputLine.startsWith("SHUTDOWN"))
-            {
-                // if we are a participant, leave the chat first
-                if(hasJoined)
-                {
-                    // send leave request
-                    try
-                    {
-                        // open connection to server
-                        serverConnection = new Socket(ChatClient.serverNodeInfo.getAddress(), ChatClient.serverNodeInfo.getPort());
-
-                        // open object streams
-                        readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-                        writeToNet = new ObjectOutputStream(serverConnection.getOutputStream());
-
-                        // send leave request
-                        writeToNet.writeObject(new Message(SHUTDOWN, ChatClient.myNodeInfo));
-
-                        // close connection
-                        serverConnection.close();
-
-                        System.out.println("Left chat...");
-                    }
-                    catch(Exception e)
-                    {
-                        System.err.println("Error opening or writing to object streams, or closing connection");
-                    }
-                }
-
-                System.out.println("Exiting...\n");
-                System.exit(1);
+                // NOTE: should handle shutdown in send_message
             }
             else // sending a note
             {
@@ -206,18 +188,9 @@ public class Sender extends Thread implements MessageTypes
                 // send note
                 try
                 {
-                    // open connection to server
-                    serverConnection = new Socket(ChatClient.serverNodeInfo.getAddress(), ChatClient.serverNodeInfo.getPort());
-
-                    // open object streams
-                    readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-                    writeToNet = new ObjectOutputStream(serverConnection.getOutputStream());
-
-                    // send note
-                    writeToNet.writeObject(new Message(NOTE, ChatClient.myNodeInfo.getName() + ": " + inputLine));
-
-                    // close connection
-                    serverConnection.close();
+                    message = new Message(NOTE, chatNode.myNodeInfo, chatNode.nextNode);
+                    
+                    send_message(message);
 
                     System.out.println("Message sent...");
                 }
@@ -228,5 +201,36 @@ public class Sender extends Thread implements MessageTypes
                 }
             }
         }
-    } 
+    }
+
+
+    // sender function that gets called by the 
+    void send_message(Message message)
+    {
+        // variables
+        Socket connection;
+
+        // open connection to server
+        connection = new Socket(message.getNextNode().getAddress(), message.getNextNode().getPort());
+
+        // open object streams
+        //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
+        writeToNet = new ObjectOutputStream(connection.getOutputStream());
+
+        // send note
+        writeToNet.writeObject(message);
+
+        // close connection
+        connection.close();
+
+        System.out.println("Message sent...");
+
+        if(message.getType() == SHUTDOWN_ALL)
+        {
+            System.out.println("Sent shutdown all notice...\n");
+            
+            System.out.println("Exiting...\n");
+            System.exit(1);
+        }
+    }
 }

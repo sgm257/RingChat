@@ -17,27 +17,26 @@ import static message.MessageTypes.SHUTDOWN;
  */
 public class ReceiverWorker extends Thread
 {
-    Socket serverConnection = null;
-
+    Socket previousNodeConnection = null;
     ObjectInputStream readFromNet = null;
-    ObjectOutputStream writeToNet = null;
-
     Message message = null;
+    Sender sender = null;
+    ChatNode chatNode = null;
 
     /**
      * Constructor
      * 
      * @param serverConnection
      */
-    public ReceiverWorker(Socket serverConnection)
+    public ReceiverWorker(ChatNode chatNode, Socket previousNodeConnection)
     {
-        this.serverConnection = serverConnection;
+        this.previousNodeConnection = previousNodeConnection;
+        this.chatNode = chatNode;
 
         // open object streams
         try
         {
-            readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-            writeToNet = new ObjectOutputStream(serverConnection.getOutputStream());
+            readFromNet = new ObjectInputStream(previousNodeConnection.getInputStream());
         }
         catch(Exception e)
         {
@@ -66,37 +65,64 @@ public class ReceiverWorker extends Thread
         // decide what to do depending on the type of message received
         switch(message.getType())
         {
-            case SHUTDOWN:
-                System.out.println("Received shutdown message from server, exiting");
+            case JOIN:
+                System.out.println("Received join message from %s, processing", message.getSender().getName());
 
-                try
-                {
-                    // close server connection
-                    serverConnection.close();
-                }
-                catch(Exception e)
-                {
-                    System.err.println("Couldn't close connection");
-                }
+                String test = new String("approved");
 
-                // exit system
-                System.exit(1);
+                if(test.equals(message.getContent()))
+                {
+                    System.out.println("Join approved! Closing ring...");
+
+                    // set next node to sender, closing the ring
+                    chatNode.setNextNodeInfo(message.getSender());
+                }
+                else if(!chatNode.nextNode.equals(message.getSender()))
+                {
+                    Message message = new Message(JOIN_APPROVED, myNodeInfo, chatNode.nextNode);
+
+                    chatNode.setNextNodeInfo(message.getSender());
+
+                    // call some function to set up new next node connection?
+                    
+                    sender.send_message(message);
+                }
 
                 break;
 
             case NOTE:
-                System.out.println((String) message.getContent());
+                System.out.println("Received note message from %s, processing", message.getSender().getName());
 
-                try
+                System.out.println((String) message.getContent());
+                
+                if(!chatNode.nextNode.equals(message.getSender()))
                 {
-                    serverConnection.close();
+                    sender.send_message(message);
                 }
-                catch(Exception e)
+                
+                break;
+
+            case LEAVE:
+                System.out.println("Received leave message from %s, processing", message.getSender().getName());
+
+                if(!chatNode.nextNode.equals(message.getSender()))
                 {
-                    System.err.println("Error closing server connection");
+                    sender.send_message(message);
+                }
+                else
+                {
+                    chatNode.setNextNodeInfo(message.getNextNode());
                 }
 
                 break;
+
+            case SHUTDOWN_ALL:
+                if(!chatNode.nextNode.equals(message.getSender()))
+                {
+                    sender.send_message(message);
+                }
+
+                break;            
 
             default:
                 // cannot occur

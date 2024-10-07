@@ -2,7 +2,6 @@ package chat;
 
 import java.io.IOException;
 import java.util.Properties;
-import utils.NetworkUtilities;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,71 +23,54 @@ public class ChatNode implements Runnable
     static Sender sender = null;
 
     // this client connectivity information
-    public static NodeInfo myNodeInfo = null;
-    public static NodeInfo nextNode = null;
+    private static NodeInfo myNodeInfo = null;
+    private static NodeInfo nextNode = null;
 
     // constructor
     public ChatNode(String propertiesFile)
     {
         // get properties from properties file
         Properties properties = null;
-        try
-        {
-            properties = new PropertyHandler(propertiesFile);
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error getting info from properties file");
-            System.exit(1);
-        }
-
-        // get my reciver port number
+        String myIP;
         int myPort = 0;
-        try
-        {
-            myPort = Integer.parseInt(properties.getProperty("MY_PORT"));
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error parsing port from properties file");
-        }
+        String myName;
+
+        // parse properties file
+        properties = new PropertyHandler(propertiesFile);
+
+        // get my IP
+        myIP = properties.getProperty("MY_IP");
+
+        // get my port
+        myPort = Integer.parseInt(properties.getProperty("MY_PORT"));
 
         // get my name
-        String myName = properties.getProperty("MY_NAME");
-        if(myName == null)
-        {
-            System.err.println("Could not read my name");
-        }
-
+        myName = properties.getProperty("MY_NAME");
+        
         // create my own node info
-        //myNodeInfo = new NodeInfo(NetworkUtilities.getMyIP(), myPort, myName);
-        myNodeInfo = new NodeInfo(23.254.166.230, 12345, "Frodo");
+        myNodeInfo = new NodeInfo(myIP, myPort, myName);
+    }
 
-        // get server default port
-        int serverPort = 0;
-        try
-        {
-            serverPort = Integer.parseInt(properties.getProperty("SERVER_PORT"));
-        }
-        catch(Exception e)
-        {
-            System.err.println("Could not read server port");
-        }
+    // getters
+    NodeInfo getMyNodeInfo()
+    {
+        return myNodeInfo;
+    }
 
-        // get server default IP
-        String serverIP = null;
-        serverIP = properties.getProperty("SERVER_IP");
-        if(serverIP == null)
-        {
-            System.err.println("Could not read server IP");
-        }
+    NodeInfo getNextNodeInfo()
+    {
+        return nextNode;
+    }
 
-        // create server default connectivity information
-        // TODO figure out how to do this...
-        if(serverPort != 0 && serverIP != null)
-        {
-            nextNode = new NodeInfo(serverIP, serverPort);
-        }
+    // setters
+    void setMyNodeInfo(NodeInfo info)
+    {
+        this.myNodeInfo = info;
+    }
+
+    void setNextNodeInfo(NodeInfo info)
+    {
+        this.nextNode = info;
     }
 
     // code entry point, not used for threading
