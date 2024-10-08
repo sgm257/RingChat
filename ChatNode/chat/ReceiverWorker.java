@@ -47,16 +47,22 @@ public class ReceiverWorker extends Thread
             System.err.println("[ReceiverWorker.ReceiverWorker] Error opening input and output streams");
         }
 
+        sender = new Sender(chatNode);
+
     }
 
     // thread code entry point
     @Override
     public void run()
     {
+        System.err.println("[RecieverWorker].run in function");
+        
         try
         {
             // read message
             message = (Message)readFromNet.readObject();
+
+            System.err.println("[RecieverWorker].run read object");
         }
         catch(Exception e)
         {
@@ -81,15 +87,20 @@ public class ReceiverWorker extends Thread
                     // set next node to sender, closing the ring
                     chatNode.setNextNodeInfo(message.getSender());
                 }
-                else if(!chatNode.getNextNode().equals(message.getSender()))
+                else if(!chatNode.getNextNode().equals(message.getSender())) // error?? null pointer, trying to access something that doesn't exist...
+                // most likely because next node hasn't been set yet, need to think of a way around that issue
                 {
-                    Message message = new Message(JOIN, chatNode.getMyNodeInfo(), chatNode.getNextNode());
+                    System.out.println("Next node should be: " + message.getSender().getAddress() + ":" + message.getSender().getPort() + " " + message.getSender().getName());
 
                     chatNode.setNextNodeInfo(message.getSender());
 
+                    System.out.println("Next node is: " + chatNode.getNextNode().getName());
+
                     // call some function to set up new next node connection?
+
+                    Message mess = new Message(JOIN, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
-                    sender.send_message(message);
+                    sender.send_message(mess);
                 }
 
                 break;
@@ -121,6 +132,8 @@ public class ReceiverWorker extends Thread
                 break;
 
             case SHUTDOWN_ALL:
+                System.out.println("Received shutdown all message from " + message.getSender().getName() + ", processing");
+                
                 if(!chatNode.getNextNode().equals(message.getSender()))
                 {
                     sender.send_message(message);

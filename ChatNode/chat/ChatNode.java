@@ -25,6 +25,7 @@ public class ChatNode implements Runnable
     // this client connectivity information
     private static NodeInfo myNodeInfo = null;
     private static NodeInfo nextNode = null;
+    public static boolean hasJoined = false;
 
     // constructor
     public ChatNode(String propertiesFile)
@@ -57,6 +58,9 @@ public class ChatNode implements Runnable
         
         // create my own node info
         myNodeInfo = new NodeInfo(myIP, myPort, myName);
+
+        //nextNode = new NodeInfo("0.0.0.0", 0, "dummy");
+        nextNode = new NodeInfo(myIP, myPort, myName);
     }
 
     // getters
@@ -78,7 +82,9 @@ public class ChatNode implements Runnable
 
     void setNextNodeInfo(NodeInfo info)
     {
-        this.nextNode = info;
+        this.nextNode.address = info.address;
+        this.nextNode.port = info.port;
+        this.nextNode.name = info.name;
     }
 
     // code entry point, not used for threading
