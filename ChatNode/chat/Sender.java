@@ -119,28 +119,6 @@ public class Sender extends Thread implements MessageTypes
 
                 System.out.println("Left chat...");
             }
-            else if(inputLine.startsWith("SHUTDOWN"))
-            {
-                if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
-                {
-                    // we are a participant, send out a SHUTDOWN_ALL message
-                    try
-                    {
-                        message = new Message(LEAVE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
-                        
-                        send_message(message);                    
-                    }
-                    catch(Exception e)
-                    {
-                        System.err.println("Error opening or writing to object streams, or closing connection");
-                    }
-
-                    System.out.println("Sent shutdown notice...\n");
-                }
-
-                System.out.println("Exiting...\n");
-                System.exit(1);
-            }
             else if(inputLine.startsWith("SHUTDOWN_ALL"))
             {
                 // check if we are in the chat
@@ -164,6 +142,28 @@ public class Sender extends Thread implements MessageTypes
 
                 // NOTE: should handle shutdown in send_message
             }
+            else if(inputLine.startsWith("SHUTDOWN"))
+            {
+                if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
+                {
+                    // we are a participant, send out a SHUTDOWN_ALL message
+                    try
+                    {
+                        message = new Message(LEAVE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
+                        
+                        send_message(message);                    
+                    }
+                    catch(Exception e)
+                    {
+                        System.err.println("Error opening or writing to object streams, or closing connection");
+                    }
+
+                    System.out.println("Sent shutdown notice...\n");
+                }
+
+                System.out.println("Exiting...\n");
+                System.exit(1);
+            }
             else // sending a note
             {
                 if(!chatNode.hasJoined)
@@ -178,8 +178,6 @@ public class Sender extends Thread implements MessageTypes
                     message = new Message(NOTE, inputLine, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     send_message(message);
-
-                    System.out.println("Message sent...");
                 }
                 catch(Exception e)
                 {
@@ -197,24 +195,27 @@ public class Sender extends Thread implements MessageTypes
         // variables
         Socket connection;        
 
-        try
+        if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
         {
-            // open connection to server
-            connection = new Socket(message.getNextNode().getAddress(), message.getNextNode().getPort());
+            try
+            {
+                // open connection to server
+                connection = new Socket(message.getNextNode().getAddress(), message.getNextNode().getPort());
 
-            // open object streams
-            //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-            writeToNet = new ObjectOutputStream(connection.getOutputStream());
+                // open object streams
+                //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
+                writeToNet = new ObjectOutputStream(connection.getOutputStream());
 
-            // send note
-            writeToNet.writeObject(message);
+                // send note
+                writeToNet.writeObject(message);
 
-            // close connection
-            connection.close();
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error connecting to server, opening streams, or closing connection");
+                // close connection
+                connection.close();
+            }
+            catch(Exception e)
+            {
+                System.err.println("Error connecting to server, opening streams, or closing connection");
+            }
         }
 
         System.out.println("Message sent...");

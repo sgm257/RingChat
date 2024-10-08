@@ -109,8 +109,6 @@ public class ReceiverWorker extends Thread
                 System.out.println("Received note message from " + message.getSender().getName() + ", processing");
 
                 System.out.println((String) message.getContent());
-
-                System.out.println("Done!");
                 
                 if(!chatNode.getNextNode().equals(message.getSender()))
                 {
@@ -139,6 +137,11 @@ public class ReceiverWorker extends Thread
                 if(!chatNode.getNextNode().equals(message.getSender()))
                 {
                     sender.send_message(message);
+                }
+                else
+                {
+                    System.out.println("Exiting...\n");
+                    System.exit(1);
                 }
 
                 break;            
