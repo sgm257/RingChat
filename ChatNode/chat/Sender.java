@@ -40,22 +40,6 @@ public class Sender extends Thread implements MessageTypes
     // make a sender function that can take input from either the command line
     // or the reciever worker as a parameter
 
-    /*
-    Name: run
-    Process: monitors the command line input and takes appropriate action based on the requested command
-             JOIN: 
-             LEAVE: 
-             SHUTDOWN:
-             SHUTDOWN_ALL:
-             NOTE:
-    Function Input/Parameters: 
-    Function Output/Parameters: 
-    Function Output/Returned: 
-    Device Input/device: 
-    Device Output/device: 
-    Dependencies: 
-    */
-
     // implementation interface runnable not needed for threading
     @Override
     public void run()
@@ -191,7 +175,7 @@ public class Sender extends Thread implements MessageTypes
                 // send note
                 try
                 {
-                    message = new Message(NOTE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
+                    message = new Message(NOTE, inputLine, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     send_message(message);
 
