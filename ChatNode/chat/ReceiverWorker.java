@@ -88,15 +88,20 @@ public class ReceiverWorker extends Thread
                 {
                     System.out.println("Join approved! Closing ring...");
 
+                    System.out.println("OG Next node: " + chatNode.getNextNode().getName());
+
                     // set next node to sender, closing the ring
                     chatNode.setNextNodeInfo(message.getNextNode());
+
+                    System.out.println("New Next node: " + chatNode.getNextNode().getName());
 
                     // we are in!
                     chatNode.hasJoined = true;
 
                     System.out.println("Joined chat...");
                 }
-                else if(!chatNode.getNextNode().equals(message.getSender()))
+                //else if(!chatNode.getNextNode().equals(message.getSender()))
+                else
                 {
                     // call some function to set up new next node connection?
 
