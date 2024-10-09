@@ -199,7 +199,8 @@ public class Sender extends Thread implements MessageTypes
 
         System.out.println("Um... am I running the wrong thing??");
 
-        if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
+        // if next node is not sender
+        if(!chatNode.getNextNode().equals(message.getSender()))
         {
             try
             {
@@ -241,27 +242,24 @@ public class Sender extends Thread implements MessageTypes
 
         System.out.println("Sending to: " + sendTo.getAddress() + ":" + sendTo.getPort() + " " + sendTo.getName());
 
-        if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
+        try
         {
-            try
-            {
-                // open connection to server
-                connection = new Socket(sendTo.getAddress(), sendTo.getPort());
+            // open connection to server
+            connection = new Socket(sendTo.getAddress(), sendTo.getPort());
 
-                // open object streams
-                //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
-                writeToNet = new ObjectOutputStream(connection.getOutputStream());
+            // open object streams
+            //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
+            writeToNet = new ObjectOutputStream(connection.getOutputStream());
 
-                // send note
-                writeToNet.writeObject(message);
+            // send note
+            writeToNet.writeObject(message);
 
-                // close connection
-                connection.close();
-            }
-            catch(Exception e)
-            {
-                System.err.println("Error connecting to server, opening streams, or closing connection");
-            }
+            // close connection
+            connection.close();
+        }
+        catch(Exception e)
+        {
+            System.err.println("Error connecting to server, opening streams, or closing connection");
         }
 
         System.out.println("Message sent...");
