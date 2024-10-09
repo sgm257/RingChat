@@ -89,7 +89,7 @@ public class ReceiverWorker extends Thread
                     System.out.println("Join approved! Closing ring...");
 
                     // set next node to sender, closing the ring
-                    chatNode.setNextNodeInfo(message.getSender());
+                    chatNode.setNextNodeInfo(message.getNextNode());
 
                     // we are in!
                     chatNode.hasJoined = true;
