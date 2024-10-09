@@ -82,15 +82,21 @@ public class ReceiverWorker extends Thread
 
                 String approved = new String("approved");
 
-                if(approved.equals(message.getContent()))
+                System.out.println("Content: " + message.getContent());
+
+                if(approved.equals((String)message.getContent()))
                 {
                     System.out.println("Join approved! Closing ring...");
 
                     // set next node to sender, closing the ring
                     chatNode.setNextNodeInfo(message.getSender());
+
+                    // we are in!
+                    chatNode.hasJoined = true;
+
+                    System.out.println("Joined chat...");
                 }
-                else if(!chatNode.getNextNode().equals(message.getSender())) // error?? null pointer, trying to access something that doesn't exist...
-                // most likely because next node hasn't been set yet, need to think of a way around that issue
+                else if(!chatNode.getNextNode().equals(message.getSender()))
                 {
                     System.out.println("Next node should be: " + message.getSender().getAddress() + ":" + message.getSender().getPort() + " " + message.getSender().getName());
 
@@ -100,7 +106,7 @@ public class ReceiverWorker extends Thread
 
                     // call some function to set up new next node connection?
 
-                    Message mess = new Message(JOIN, chatNode.getMyNodeInfo(), chatNode.getNextNode());
+                    Message mess = new Message(JOIN, "approved", chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     sender.send_message(mess);
                 }
@@ -110,9 +116,9 @@ public class ReceiverWorker extends Thread
             case NOTE:
                 System.out.println("Received note message from " + message.getSender().getName() + ", processing");
 
-                System.out.println("Next node is: " + chatNode.getNextNode().getName());
+                System.out.println("Next node is: " + chatNode.getNextNode().getAddress());
 
-                System.out.println((String) message.getContent());
+                System.out.println(message.getSender().getName() + ": " + (String) message.getContent());
                 
                 if(!chatNode.getNextNode().equals(message.getSender()))
                 {

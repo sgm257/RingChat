@@ -88,10 +88,10 @@ public class Sender extends Thread implements MessageTypes
                     continue;
                 }
 
-                // we are in!
-                chatNode.hasJoined = true;
+                // // we are in!
+                // chatNode.hasJoined = true;
 
-                System.out.println("Joined chat...");
+                // System.out.println("Joined chat...");
             }
             else if(inputLine.startsWith("LEAVE"))
             {
@@ -195,7 +195,7 @@ public class Sender extends Thread implements MessageTypes
         // variables
         Socket connection;    
 
-        System.out.println("Next node is: " + chatNode.getNextNode().getName());    
+        System.out.println("Next node is: " + chatNode.getNextNode().getAddress());
 
         if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
         {

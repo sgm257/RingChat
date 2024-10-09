@@ -25,7 +25,7 @@ public class NodeInfo implements Serializable
     }
 
     /**
-     * Constructor when name is nul;
+     * Constructor when name is null
      * 
      * @param address
      * @param port
