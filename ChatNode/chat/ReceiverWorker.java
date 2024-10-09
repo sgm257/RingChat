@@ -98,17 +98,17 @@ public class ReceiverWorker extends Thread
                 }
                 else if(!chatNode.getNextNode().equals(message.getSender()))
                 {
-                    System.out.println("Next node should be: " + message.getSender().getAddress() + ":" + message.getSender().getPort() + " " + message.getSender().getName());
-
-                    chatNode.setNextNodeInfo(message.getSender());
-
-                    System.out.println("Next node is: " + chatNode.getNextNode().getName());
-
                     // call some function to set up new next node connection?
 
                     Message mess = new Message(JOIN, "approved", chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
                     sender.send_message(mess);
+
+                    System.out.println("Next node should be: " + message.getSender().getAddress() + ":" + message.getSender().getPort() + " " + message.getSender().getName());
+
+                    chatNode.setNextNodeInfo(message.getSender());
+
+                    System.out.println("Next node is: " + chatNode.getNextNode().getName());
                 }
 
                 break;
