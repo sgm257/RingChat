@@ -79,8 +79,6 @@ public class ReceiverWorker extends Thread
 
                 String approved = new String("approved");
 
-                System.out.println("Content: " + message.getContent());
-
                 if(approved.equals((String)message.getContent()))
                 {
                     System.out.println("Join approved! Closing ring...");
@@ -120,6 +118,8 @@ public class ReceiverWorker extends Thread
             case LEAVE:
                 if(!chatNode.getNextNode().equals(message.getSender()))
                 {
+                    System.out.println(message.getSender().getName() + " has left the chat");
+                    
                     sender.send_message(message);
                 }
                 else
