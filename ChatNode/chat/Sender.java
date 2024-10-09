@@ -195,12 +195,6 @@ public class Sender extends Thread implements MessageTypes
         // variables
         Socket connection;    
 
-        //System.out.println("Next node is: " + chatNode.getNextNode().getAddress());
-
-        System.out.println("Sending to: " + chatNode.getNextNode().getAddress() + ":" + chatNode.getNextNode().getPort() + " " + chatNode.getNextNode().getName());
-
-        System.out.println("Um... am I running the wrong thing??");
-
         // if next node is not sender
         if(!chatNode.getNextNode().equals(message.getSender()))
         {
@@ -210,7 +204,6 @@ public class Sender extends Thread implements MessageTypes
                 connection = new Socket(chatNode.getNextNode().getAddress(), chatNode.getNextNode().getPort());
 
                 // open object streams
-                //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
                 writeToNet = new ObjectOutputStream(connection.getOutputStream());
 
                 // send note
@@ -224,8 +217,6 @@ public class Sender extends Thread implements MessageTypes
                 System.err.println("Error connecting to server, opening streams, or closing connection");
             }
         }
-
-        System.out.println("Message sent...");
 
         if(message.getType() == SHUTDOWN_ALL)
         {
@@ -241,8 +232,6 @@ public class Sender extends Thread implements MessageTypes
     {
         // variables
         Socket connection;
-
-        System.out.println("Sending to: " + sendTo.getAddress() + ":" + sendTo.getPort() + " " + sendTo.getName());
 
         try
         {
@@ -263,8 +252,6 @@ public class Sender extends Thread implements MessageTypes
         {
             System.err.println("Error connecting to server, opening streams, or closing connection");
         }
-
-        System.out.println("Message sent...");
 
         if(message.getType() == SHUTDOWN_ALL)
         {
