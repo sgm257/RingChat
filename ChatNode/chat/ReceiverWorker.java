@@ -116,10 +116,10 @@ public class ReceiverWorker extends Thread
                 break;
 
             case LEAVE:
+                System.out.println(message.getSender().getName() + " has left the chat");
+                
                 if(!chatNode.getNextNode().equals(message.getSender()))
-                {
-                    System.out.println(message.getSender().getName() + " has left the chat");
-                    
+                {                    
                     sender.send_message(message);
                 }
                 else
