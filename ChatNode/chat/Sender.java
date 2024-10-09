@@ -195,7 +195,9 @@ public class Sender extends Thread implements MessageTypes
         // variables
         Socket connection;    
 
-        System.out.println("Next node is: " + chatNode.getNextNode().getAddress());
+        //System.out.println("Next node is: " + chatNode.getNextNode().getAddress());
+
+        System.out.println("Sending to: " + chatNode.getNextNode().getAddress() + ":" + chatNode.getNextNode().getPort() + " " + chatNode.getNextNode().getName());
 
         System.out.println("Um... am I running the wrong thing??");
 
