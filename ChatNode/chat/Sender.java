@@ -207,7 +207,7 @@ public class Sender extends Thread implements MessageTypes
             try
             {
                 // open connection to server
-                connection = new Socket(message.getNextNode().getAddress(), message.getNextNode().getPort());
+                connection = new Socket(chatNode.getNextNode().getAddress(), chatNode.getNextNode().getPort());
 
                 // open object streams
                 //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
