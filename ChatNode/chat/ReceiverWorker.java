@@ -78,9 +78,11 @@ public class ReceiverWorker extends Thread
             case JOIN:
                 System.out.println("Received join message from " + message.getSender().getName() + ", processing");
 
-                String test = new String("approved");
+                chatNode.hasJoined = true;
 
-                if(test.equals(message.getContent()))
+                String approved = new String("approved");
+
+                if(approved.equals(message.getContent()))
                 {
                     System.out.println("Join approved! Closing ring...");
 
@@ -107,6 +109,8 @@ public class ReceiverWorker extends Thread
 
             case NOTE:
                 System.out.println("Received note message from " + message.getSender().getName() + ", processing");
+
+                System.out.println("Next node is: " + chatNode.getNextNode().getName());
 
                 System.out.println((String) message.getContent());
                 
