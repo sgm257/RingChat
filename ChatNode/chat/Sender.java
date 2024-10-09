@@ -197,6 +197,8 @@ public class Sender extends Thread implements MessageTypes
 
         System.out.println("Next node is: " + chatNode.getNextNode().getAddress());
 
+        System.out.println("Um... am I running the wrong thing??");
+
         if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
         {
             try
@@ -237,7 +239,7 @@ public class Sender extends Thread implements MessageTypes
         // variables
         Socket connection;
 
-        System.out.println("Sending to: " + sendTo.getAddress());
+        System.out.println("Sending to: " + sendTo.getAddress() + ":" + sendTo.getPort() + " " + sendTo.getName());
 
         if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
         {
