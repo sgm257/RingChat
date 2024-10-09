@@ -230,4 +230,46 @@ public class Sender extends Thread implements MessageTypes
             System.exit(1);
         }
     }
+
+    // function overload for join case
+    void send_message(Message message, NodeInfo sendTo)
+    {
+        // variables
+        Socket connection;
+
+        System.out.println("Sending to: " + sendTo.getAddress());
+
+        if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
+        {
+            try
+            {
+                // open connection to server
+                connection = new Socket(sendTo.getAddress(), sendTo.getPort());
+
+                // open object streams
+                //readFromNet = new ObjectInputStream(serverConnection.getInputStream());
+                writeToNet = new ObjectOutputStream(connection.getOutputStream());
+
+                // send note
+                writeToNet.writeObject(message);
+
+                // close connection
+                connection.close();
+            }
+            catch(Exception e)
+            {
+                System.err.println("Error connecting to server, opening streams, or closing connection");
+            }
+        }
+
+        System.out.println("Message sent...");
+
+        if(message.getType() == SHUTDOWN_ALL)
+        {
+            System.out.println("Sent shutdown all notice...\n");
+            
+            System.out.println("Exiting...\n");
+            System.exit(1);
+        }
+    }
 }

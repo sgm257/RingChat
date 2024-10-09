@@ -102,9 +102,7 @@ public class ReceiverWorker extends Thread
 
                     Message mess = new Message(JOIN, "approved", chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
-                    sender.send_message(mess);
-
-                    System.out.println("Next node should be: " + message.getSender().getAddress() + ":" + message.getSender().getPort() + " " + message.getSender().getName());
+                    sender.send_message(mess, message.getSender());
 
                     chatNode.setNextNodeInfo(message.getSender());
 
