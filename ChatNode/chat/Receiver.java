@@ -1,11 +1,12 @@
+// define package
 package chat;
 
+// imports
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-// included to make server socket work
 import java.net.ServerSocket;
 
 import java.util.Scanner;
@@ -16,8 +17,10 @@ import java.util.logging.Logger;
 import message.Message;
 import message.MessageTypes;
 
+// class definition
 public class Receiver extends Thread
 {
+    // member variables
     static ServerSocket receiverSocket = null;
     static String userName = null;
     static ChatNode chatNode = null;
@@ -25,13 +28,13 @@ public class Receiver extends Thread
     // Constructor
     public Receiver(ChatNode chatNode)
     {
+        // set chat node
         this.chatNode = chatNode;
         
         try
         {
-            //receiverSocket = new ServerSocket(chatNode.getMyNodeInfo().getAddress(), chatNode.getMyNodeInfo().getPort());
+            // create receiver socket
             receiverSocket = new ServerSocket(chatNode.getMyNodeInfo().getPort());
-            System.out.println("[Receiver.Receiver] receiver socket created, listening on port " + chatNode.getMyNodeInfo().getPort());
         }
         catch(Exception e)
         {
@@ -49,10 +52,7 @@ public class Receiver extends Thread
         {
             try
             {
-                // previously, this wouldn't run until it got a connection...
-                // I made receiverSocket a ServerSocket type so that I can run accept()
-                // which will return a socket type of the previous connection
-                // after someone requests to send a message
+                // start the receiver worker
                 (new ReceiverWorker(chatNode, receiverSocket.accept())).start();
             }
             catch(Exception e)

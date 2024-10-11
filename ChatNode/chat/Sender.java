@@ -1,5 +1,7 @@
+// define package
 package chat;
 
+// imports
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,24 +23,19 @@ import message.MessageTypes;
  */
 public class Sender extends Thread implements MessageTypes
 {
+    // member variables
     Socket connection = null;
     ObjectOutputStream writeToNet;
     Scanner userInput = new Scanner(System.in);
     String inputLine = null;
     ChatNode chatNode = null;
-    //boolean hasJoined;  // flag indicating if we have joined chat
 
     // Constructor
     public Sender(ChatNode chatNode)
     {
         this.chatNode = chatNode;
         userInput = new Scanner(System.in);
-        //hasJoined = false;
     }
-
-
-    // make a sender function that can take input from either the command line
-    // or the reciever worker as a parameter
 
     // implementation interface runnable not needed for threading
     @Override
@@ -52,6 +49,7 @@ public class Sender extends Thread implements MessageTypes
             // get user input
             inputLine = userInput.nextLine();
 
+            // if the input starts with JOIN
             if(inputLine.startsWith("JOIN"))
             {
                 // ignore if we have already joined a chat
@@ -78,8 +76,10 @@ public class Sender extends Thread implements MessageTypes
                 // server information was provided, so send join request
                 try
                 {
+                    // create message
                     message = new Message(JOIN, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
+                    // send message
                     send_message(message);
                 }
                 catch(Exception e)
@@ -87,14 +87,11 @@ public class Sender extends Thread implements MessageTypes
                     System.err.println("Error connecting to server, opening streams, or closing connection");
                     continue;
                 }
-
-                // // we are in!
-                // chatNode.hasJoined = true;
-
-                // System.out.println("Joined chat...");
             }
+            // else if the input starts with LEAVE
             else if(inputLine.startsWith("LEAVE"))
             {
+                // ignore if the node isn't joined to a chat
                 if(!chatNode.hasJoined)
                 {
                     System.err.println("You have not joined a chat...");
@@ -104,8 +101,10 @@ public class Sender extends Thread implements MessageTypes
                 // send leave request
                 try
                 {
+                    // create message
                     message = new Message(LEAVE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
+                    // send message
                     send_message(message);
                 }
                 catch(Exception e)
@@ -119,6 +118,7 @@ public class Sender extends Thread implements MessageTypes
 
                 System.out.println("Left chat...");
             }
+            // else if the input starts with SHUTDOWN_ALL
             else if(inputLine.startsWith("SHUTDOWN_ALL"))
             {
                 // check if we are in the chat
@@ -131,8 +131,10 @@ public class Sender extends Thread implements MessageTypes
                 // we are a participant, send out a SHUTDOWN_ALL message
                 try
                 {
+                    // create message
                     message = new Message(SHUTDOWN_ALL, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
+                    // send message
                     send_message(message);
                 }
                 catch(Exception e)
@@ -140,32 +142,36 @@ public class Sender extends Thread implements MessageTypes
                     System.err.println("Error opening or writing to object streams, or closing connection");
                 }
 
-                // NOTE: should handle shutdown in send_message
+                // NOTE: shutdown is handled in send_message
             }
+            // else if the line starts with SHUTDOWN
             else if(inputLine.startsWith("SHUTDOWN"))
             {
+                // if the next node isn't me (we aren't the only one in the chat)
                 if(!chatNode.getNextNode().equals(chatNode.getMyNodeInfo()))
                 {
                     // we are a participant, send out a SHUTDOWN_ALL message
                     try
                     {
+                        // create a LEAVE message
                         message = new Message(LEAVE, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                         
+                        // send message
                         send_message(message);                    
                     }
                     catch(Exception e)
                     {
                         System.err.println("Error opening or writing to object streams, or closing connection");
                     }
-
-                    System.out.println("Sent shutdown notice...\n");
                 }
 
                 System.out.println("Exiting...\n");
                 System.exit(1);
             }
-            else // sending a note
+            // else the person wants to send a note
+            else
             {
+                // check if the node is joined
                 if(!chatNode.hasJoined)
                 {
                     System.err.println("You need to join a chat first!");
@@ -175,8 +181,10 @@ public class Sender extends Thread implements MessageTypes
                 // send note
                 try
                 {
+                    // create message
                     message = new Message(NOTE, inputLine, chatNode.getMyNodeInfo(), chatNode.getNextNode());
                     
+                    // send message
                     send_message(message);
                 }
                 catch(Exception e)
@@ -218,6 +226,7 @@ public class Sender extends Thread implements MessageTypes
             }
         }
 
+        // if the message is SHUTDOWN_ALL, shutdown the node after sending
         if(message.getType() == SHUTDOWN_ALL)
         {
             System.out.println("Sent shutdown all notice...\n");
@@ -253,6 +262,7 @@ public class Sender extends Thread implements MessageTypes
             System.err.println("Error connecting to server, opening streams, or closing connection");
         }
 
+        // if the message is SHUTDOWN_ALL, shutdown the node after sending
         if(message.getType() == SHUTDOWN_ALL)
         {
             System.out.println("Sent shutdown all notice...\n");

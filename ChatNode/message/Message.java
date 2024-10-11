@@ -24,7 +24,7 @@ public class Message implements MessageTypes, Serializable {
     // next node ip info
     NodeInfo nextNode = null;
 
-    // constructor (s)
+    // constructor(s)
     public Message(int type, String content, NodeInfo sender, NodeInfo nextNode) {
         this.type = type;
         this.content = content;

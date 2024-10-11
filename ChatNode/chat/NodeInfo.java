@@ -1,5 +1,7 @@
+// define package
 package chat;
 
+// imports
 import java.io.Serializable;
 
 /**
@@ -19,6 +21,7 @@ public class NodeInfo implements Serializable
      */
     public NodeInfo(String address, int port, String name)
     {
+        // member variables
         this.address = address;
         this.port = port;
         this.name = name;
@@ -57,8 +60,7 @@ public class NodeInfo implements Serializable
      * Implicitly used in the ArrayList's remove()
      * Two NodeInfo objects are the same if the IPs and the ports are the same
      * 
-     * @param other
-     * @return
+     * @author wolfdeiterotte
      */
     @Override
     public boolean equals(Object other)

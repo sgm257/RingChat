@@ -1,11 +1,12 @@
+// define package
 package chat;
 
+// imports
 import java.io.IOException;
 import java.util.Properties;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 import utils.PropertyHandler;
 
@@ -14,7 +15,7 @@ import utils.PropertyHandler;
  * 
  * Reads configuration information and starts up the ChatClient
  * 
- * @author wolfdieterotte
+ * @author wolfdieterotte, edits by Samantha Madderom
  */
 public class ChatNode implements Runnable
 {
@@ -25,12 +26,14 @@ public class ChatNode implements Runnable
     // this client connectivity information
     private static NodeInfo myNodeInfo = null;
     private static NodeInfo nextNode = null;
+
+    // is the chat node joined
     public static boolean hasJoined = false;
 
     // constructor
     public ChatNode(String propertiesFile)
     {
-        // get properties from properties file
+        // variables
         Properties properties = null;
         String myIP;
         int myPort = 0;
@@ -59,7 +62,7 @@ public class ChatNode implements Runnable
         // create my own node info
         myNodeInfo = new NodeInfo(myIP, myPort, myName);
 
-        //nextNode = new NodeInfo("0.0.0.0", 0, "dummy");
+        // set next node to self to begin with
         nextNode = new NodeInfo(myIP, myPort, myName);
     }
 
@@ -82,9 +85,7 @@ public class ChatNode implements Runnable
 
     void setNextNodeInfo(NodeInfo info)
     {
-        this.nextNode.address = info.address;
-        this.nextNode.port = info.port;
-        this.nextNode.name = info.name;
+        this.nextNode = info;
     }
 
     // code entry point, not used for threading
